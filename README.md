@@ -88,7 +88,7 @@ A comprehensive **Threat Intelligence Dashboard** that analyzes SolarWinds CVE e
 - pip (Python package manager)
 - Git (optional)
 
-### Step 1: Clone the Repository
+Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/Aqib-shakeel07/Brute_Force_Detection.git
