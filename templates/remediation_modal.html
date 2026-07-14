@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remediation Steps</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ============================================================
+           REMEDIATION MODAL STYLES
+           ============================================================ */
+        :root {
+            --remediation-primary: linear-gradient(135deg, #00d4ff, #00ff87);
+            --remediation-bg: rgba(10, 14, 39, 0.95);
+            --remediation-card: rgba(255, 255, 255, 0.05);
+            --remediation-border: rgba(0, 255, 135, 0.15);
+            --remediation-text: #ffffff;
+            --remediation-text-secondary: rgba(255, 255, 255, 0.7);
+            --remediation-danger: #dc2626;
+            --remediation-warning: #f59e0b;
+            --remediation-success: #22c55e;
+            --remediation-info: #3b82f6;
+            --remediation-mitre: #8b5cf6;
+            --mono-font: 'Courier New', monospace;
+        }
+
+        .remediation-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+
+        .remediation-modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .remediation-modal {
+            background: var(--remediation-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--remediation-border);
+            border-radius: 24px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 0;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px var(--remediation-border);
+        }
+
+        .remediation-modal::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .remediation-modal::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .remediation-modal::-webkit-scrollbar-thumb {
+            background: var(--remediation-primary);
+            border-radius: 10px;
+        }
+
+        /* Modal Header */
+        .remediation-header {
+            padding: 24px 30px 20px 30px;
+            border-bottom: 1px solid var(--remediation-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 10;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .remediation-header .title-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .remediation-header .title-section .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #dc2626;
+            animation: pulse 2s infinite;
+        }
+
+        .remediation-header .title-section h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, #dc2626, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .remediation-header .title-section .subtitle {
+            font-size: 0.85rem;
+            color: var(--remediation-text-secondary);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--remediation-text-secondary);
+        }
+
+        .remediation-header .close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--remediation-border);
+            color: var(--remediation-text-secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .remediation-header .close-btn:hover {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        /* Modal Body */
+        .remediation-body {
+            padding: 24px 30px 30px 30px;
+        }
+
+        /* IP Info Card */
+        .ip-info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--remediation-border);
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .ip-info-card .ip-display {
+            font-family: var(--mono-font);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--remediation-text);
+        }
+
+        .ip-info-card .threat-badge {
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ip-info-card .threat-badge.critical {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .ip-info-card .threat-badge.high {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .ip-info-card .threat-badge.medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .ip-info-card .threat-badge.low {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i { color: var(--remediation-info); }
+        .section-title.remediation i { color: #dc2626; }
+        .section-title.block i { color: #f59e0b; }
+        .section-title.protect i { color: #22c55e; }
+        .section-title.best-practices i { color: #8b5cf6; }
+        .section-title.mitre i { color: #8b5cf6; }
+
+        /* Step Cards */
+        .step-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--remediation-border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .step-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(4px);
+            border-color: rgba(0, 255, 135, 0.2);
+        }
+
+        .step-card .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--remediation-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-card .step-content {
+            flex: 1;
+        }
+
+        .step-card .step-content .step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--remediation-text);
+            margin-bottom: 4px;
+        }
+
+        .step-card .step-content .step-desc {
+            font-size: 0.85rem;
+            color: var(--remediation-text-secondary);
+            line-height: 1.5;
+        }
+
+        .step-card .step-content .step-command {
+            font-family: var(--mono-font);
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 14px;
+            border-radius: 8px;
+            margin-top: 8px;
+            color: var(--remediation-success);
+            display: inline-block;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .step-card .step-content .step-command:hover {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+
+        .step-card .step-content .step-command .copy-icon {
+            margin-left: 8px;
+            font-size: 0.7rem;
+            color: var(--remediation-text-secondary);
+            opacity: 0.5;
+        }
+
+        .step-card .step-content .step-command:hover .copy-icon {
+            opacity: 1;
+        }
+
+        /* MITRE Cards */
+        .mitre-card {
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .mitre-card:hover {
+            background: rgba(139, 92, 246, 0.08);
+            transform: translateX(4px);
+        }
+
+        .mitre-card .mitre-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .mitre-card .mitre-id {
+            font-family: var(--mono-font);
+            font-size: 0.8rem;
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .mitre-card .mitre-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--remediation-text);
+        }
+
+        .mitre-card .mitre-tactic {
+            font-size: 0.75rem;
+            color: var(--remediation-text-secondary);
+            margin-top: 4px;
+        }
+
+        .mitre-card .mitre-description {
+            font-size: 0.85rem;
+            color: var(--remediation-text-secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .mitre-badge {
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin: 16px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-box i {
+            color: #f59e0b;
+            font-size: 1.3rem;
+            margin-top: 2px;
+        }
+
+        .warning-box .warning-text {
+            font-size: 0.85rem;
+            color: var(--remediation-text-secondary);
+            line-height: 1.5;
+        }
+
+        .warning-box .warning-text strong {
+            color: #f59e0b;
+        }
+
+        /* Loading State */
+        .remediation-loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .remediation-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--remediation-success);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .remediation-loading p {
+            color: var(--remediation-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .remediation-modal { margin: 10px; max-height: 95vh; }
+            .remediation-header { padding: 18px 20px 16px 20px; }
+            .remediation-header .title-section h2 { font-size: 1.1rem; }
+            .remediation-header .title-section .subtitle { font-size: 0.75rem; }
+            .remediation-body { padding: 18px 20px 24px 20px; }
+            .ip-info-card { flex-direction: column; align-items: flex-start; }
+            .ip-info-card .ip-display { font-size: 1.1rem; }
+            .step-card { padding: 14px 16px; }
+            .step-card .step-content .step-title { font-size: 0.85rem; }
+            .step-card .step-content .step-desc { font-size: 0.8rem; }
+            .step-card .step-content .step-command { font-size: 0.7rem; padding: 6px 12px; word-break: break-all; }
+            .mitre-card { padding: 12px 14px; }
+        }
+
+        @media (max-width: 480px) {
+            .remediation-header .title-section .icon { width: 36px; height: 36px; font-size: 1.2rem; }
+            .remediation-header .title-section h2 { font-size: 0.95rem; }
+            .ip-info-card .ip-display { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================================
+         REMEDIATION MODAL
+         ============================================================ -->
+    <div class="remediation-modal-overlay" id="remediationModal">
+        <div class="remediation-modal">
+            <!-- Header -->
+            <div class="remediation-header">
+                <div class="title-section">
+                    <div class="icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                        <h2>Remediation Steps</h2>
+                        <span class="subtitle" id="modalSubtitle">Action plan for threat mitigation</span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeRemediationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="remediation-body" id="remediationBody">
+                <!-- Loading State -->
+                <div class="remediation-loading" id="remediationLoading">
+                    <div class="spinner"></div>
+                    <p>Loading remediation steps...</p>
+                </div>
+
+                <!-- Content will be injected here -->
+                <div id="remediationContent" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // REMEDIATION MODAL FUNCTIONS
+        // ============================================================
+
+        function openRemediationModal(ip, riskLevel) {
+            const modal = document.getElementById('remediationModal');
+            const loading = document.getElementById('remediationLoading');
+            const content = document.getElementById('remediationContent');
+            const subtitle = document.getElementById('modalSubtitle');
+
+            modal.classList.add('active');
+            loading.style.display = 'block';
+            content.style.display = 'none';
+            subtitle.textContent = `Loading remediation for ${ip}...`;
+
+            fetch(`/api/remediation/${ip}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch remediation data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                    subtitle.textContent = `Remediation steps for ${ip}`;
+                    content.innerHTML = renderRemediationContent(data, ip, riskLevel);
+                    
+                    // After rendering content, load MITRE mapping
+                    if (data.cves && data.cves.length > 0) {
+                        loadMITREMapping(data.cves[0]);
+                    } else {
+                        // If no CVEs, show MITRE mapping based on IP
+                        loadMITREMappingForIP(ip);
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                    content.innerHTML = `
+                        <div style="text-align: center; padding: 30px 20px;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc2626; margin-bottom: 16px; display: block;"></i>
+                            <h3 style="color: #dc2626; margin-bottom: 8px;">Error Loading Remediation</h3>
+                            <p style="color: var(--remediation-text-secondary);">${error.message}</p>
+                            <button onclick="closeRemediationModal()" style="margin-top: 16px; background: var(--remediation-primary); border: none; color: white; padding: 10px 30px; border-radius: 50px; cursor: pointer; font-weight: 600;">
+                                Close
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        function closeRemediationModal() {
+            const modal = document.getElementById('remediationModal');
+            modal.classList.remove('active');
+        }
+
+        // ============================================================
+        // RENDER REMEDIATION CONTENT
+        // ============================================================
+        function renderRemediationContent(data, ip, riskLevel) {
+            const riskClass = riskLevel ? riskLevel.toLowerCase() : 'low';
+            
+            // Get data from remediation plan
+            const remediationSteps = data.remediation_steps || data.remediation || [];
+            const blockingSteps = data.blocking_steps || data.blocking_commands || [];
+            const protectionSteps = data.protection_steps || [];
+            const bestPractices = data.best_practices || [];
+            
+            // Check if there are CVEs
+            const cves = data.cves || [];
+            const hasCVEs = cves.length > 0;
+
+            return `
+                <!-- IP Info -->
+                <div class="ip-info-card">
+                    <div>
+                        <span class="ip-display"><i class="fas fa-ip" style="color: var(--accent-1);"></i> ${ip}</span>
+                        <span style="font-size: 0.8rem; color: var(--remediation-text-secondary); margin-left: 12px; font-family: var(--mono-font);">
+                            ${data.ip_type ? data.ip_type.toUpperCase() : 'PUBLIC'} · ${data.country || 'Unknown'}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="threat-badge ${riskClass}">${riskLevel || 'LOW'}</span>
+                        ${data.threat_data?.virustotal_score ? `<span style="margin-left: 8px; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; background: rgba(220, 38, 38, 0.15); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2);">VT: ${data.threat_data.virustotal_score}%</span>` : ''}
+                        ${data.threat_data?.abuseipdb_score ? `<span style="margin-left: 8px; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">Abuse: ${data.threat_data.abuseipdb_score}%</span>` : ''}
+                        ${data.threat_data?.attempt_count ? `<span style="margin-left: 8px; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2);">Attempts: ${data.threat_data.attempt_count}</span>` : ''}
+                    </div>
+                </div>
+
+                ${hasCVEs ? `
+                <!-- CVEs Section -->
+                <div style="margin-bottom: 16px;">
+                    <h4 class="section-title" style="color: #dc2626;">
+                        <i class="fas fa-bug"></i> Associated CVEs
+                    </h4>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${cves.map(cve => `
+                            <span class="badge" style="background: rgba(220, 38, 38, 0.15); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.2); padding: 6px 14px; font-size: 0.8rem; cursor: pointer;" onclick="loadMITREMapping('${cve}')">
+                                ${cve}
+                                <i class="fas fa-crosshairs ms-1" style="font-size: 0.6rem; opacity: 0.6;"></i>
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Step 1: Remediation -->
+                ${remediationSteps.length > 0 ? `
+                <h4 class="section-title remediation">
+                    <i class="fas fa-tools"></i> Step 1: Immediate Remediation
+                </h4>
+                ${remediationSteps.map((step, index) => `
+                    <div class="step-card">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-desc">${step.description}</div>
+                            ${step.command ? `
+                                <div class="step-command" onclick="copyToClipboard('${step.command.replace(/'/g, "\\'")}')">
+                                    ${step.command}
+                                    <span class="copy-icon"><i class="fas fa-copy"></i></span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+                ` : ''}
+
+                <!-- Step 2: Blocking -->
+                ${blockingSteps.length > 0 ? `
+                <h4 class="section-title block" style="margin-top: 24px;">
+                    <i class="fas fa-ban"></i> Step 2: Block the IP
+                </h4>
+                ${blockingSteps.map((step, index) => `
+                    <div class="step-card">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-desc">${step.description}</div>
+                            ${step.command ? `
+                                <div class="step-command" onclick="copyToClipboard('${step.command.replace(/'/g, "\\'")}')">
+                                    ${step.command}
+                                    <span class="copy-icon"><i class="fas fa-copy"></i></span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+                ` : ''}
+
+                <!-- Step 3: Protection -->
+                ${protectionSteps.length > 0 ? `
+                <h4 class="section-title protect" style="margin-top: 24px;">
+                    <i class="fas fa-shield-alt"></i> Step 3: Long-term Protection
+                </h4>
+                ${protectionSteps.map((step, index) => `
+                    <div class="step-card">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-desc">${step.description}</div>
+                        </div>
+                    </div>
+                `).join('')}
+                ` : ''}
+
+                <!-- ============================================================
+                     MITRE ATT&CK Section
+                     ============================================================ -->
+                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--remediation-border);">
+                    <h4 class="section-title mitre">
+                        <i class="fas fa-crosshairs"></i> MITRE ATT&CK Mapping
+                        <span class="badge" style="background: #8b5cf6; font-size: 0.65rem; padding: 2px 10px;">${hasCVEs ? cves.length : '1'} technique(s)</span>
+                    </h4>
+                    <div id="mitreMappingContainer">
+                        <div class="text-center py-3 text-secondary">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <p class="mt-2" style="font-size: 0.85rem;">Loading MITRE mapping...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                ${bestPractices.length > 0 ? `
+                <h4 class="section-title best-practices" style="margin-top: 24px;">
+                    <i class="fas fa-star"></i> Best Practices
+                </h4>
+                ${bestPractices.map((practice, index) => `
+                    <div class="step-card">
+                        <div class="step-number" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">${index + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${practice.title}</div>
+                            <div class="step-desc">${practice.description}</div>
+                        </div>
+                    </div>
+                `).join('')}
+                ` : ''}
+
+                <!-- Warning Box -->
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-text">
+                        <strong>Important:</strong> Always test these commands in a staging environment first. 
+                        Blocking the wrong IP can cause service disruption. Document all changes made.
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--remediation-border);">
+                    <button onclick="closeRemediationModal()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--remediation-border); color: var(--remediation-text); padding: 10px 24px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                    <button onclick="window.open('/export/pdf', '_blank')" style="background: var(--remediation-primary); border: none; color: white; padding: 10px 24px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                        <i class="fas fa-file-pdf"></i> Export Report
+                    </button>
+                    <button onclick="copyAllCommands()" style="background: rgba(255,255,255,0.05); border: 1px solid var(--remediation-border); color: var(--remediation-text); padding: 10px 24px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 500;">
+                        <i class="fas fa-copy"></i> Copy All Commands
+                    </button>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // MITRE ATT&CK FUNCTIONS
+        // ============================================================
+        async function loadMITREMapping(cveId) {
+            const container = document.getElementById('mitreMappingContainer');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="text-center py-3 text-secondary">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <p class="mt-2" style="font-size: 0.85rem;">Loading MITRE mapping for ${cveId}...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`/api/mitre/cve/${cveId}`);
+                if (!response.ok) throw new Error('Failed to load MITRE mapping');
+                
+                const data = await response.json();
+                if (data.success) {
+                    renderMITREMapping(data.mapping);
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-secondary">
+                        <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
+                        <p style="font-size: 0.85rem; margin-top: 4px;">Error loading MITRE mapping</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadMITREMappingForIP(ip) {
+            const container = document.getElementById('mitreMappingContainer');
+            if (!container) return;
+
+            // Try to infer attack pattern from IP behavior
+            const pattern = 'brute_force'; // Default pattern
+            const response = await fetch(`/api/mitre/attack-pattern/${pattern}`);
+            
+            try {
+                const data = await response.json();
+                if (data.success) {
+                    renderMITREMapping(data.mapping);
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        <p style="font-size: 0.85rem; margin-top: 4px;">No MITRE mapping available</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderMITREMapping(mapping) {
+            const container = document.getElementById('mitreMappingContainer');
+            if (!container) return;
+
+            if (!mapping || !mapping.techniques || mapping.techniques.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        <p style="font-size: 0.85rem;">No MITRE techniques mapped</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="d-flex flex-column gap-2">
+            `;
+
+            mapping.techniques.forEach(tech => {
+                const tacticColor = tech.tactic_color || '#8b5cf6';
+                html += `
+                    <div class="mitre-card">
+                        <div class="mitre-header">
+                            <span class="mitre-id">${tech.id}</span>
+                            <span class="mitre-badge" style="background: ${tacticColor}20; color: ${tacticColor}; border: 1px solid ${tacticColor}30;">
+                                ${tech.tactic_name || 'Unknown Tactic'}
+                            </span>
+                        </div>
+                        <div class="mitre-name">${tech.name || tech.id}</div>
+                        <div class="mitre-description">${tech.description || 'No description available'}</div>
+                        <div class="mt-2" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-size: 0.7rem; color: var(--remediation-text-secondary);">
+                                <i class="fas fa-tag"></i> ${tech.id}
+                            </span>
+                            <span style="font-size: 0.7rem; color: var(--remediation-text-secondary);">
+                                <i class="fas fa-folder"></i> ${tech.tactic_name || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <div style="font-size: 0.75rem; color: var(--remediation-text-secondary); margin-top: 8px; padding: 8px 12px; background: rgba(139, 92, 246, 0.05); border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.1);">
+                        <i class="fas fa-info-circle"></i> 
+                        ${mapping.techniques.length} MITRE ATT&CK technique${mapping.techniques.length > 1 ? 's' : ''} mapped
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const el = event.target.closest('.step-command');
+                if (el) {
+                    const originalText = el.innerHTML;
+                    el.innerHTML = '<i class="fas fa-check" style="color: #22c55e;"></i> Copied!';
+                    setTimeout(() => { el.innerHTML = originalText; }, 2000);
+                }
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            });
+        }
+
+        function copyAllCommands() {
+            const commands = document.querySelectorAll('.step-command');
+            const texts = Array.from(commands).map(el => el.textContent.replace('Copy', '').trim());
+            const allCommands = texts.join('\n\n');
+            
+            navigator.clipboard.writeText(allCommands).then(() => {
+                alert('✅ All commands copied to clipboard!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = allCommands;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ All commands copied to clipboard!');
+            });
+        }
+
+        // ============================================================
+        // CLOSE MODAL EVENTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRemediationModal();
+            }
+        });
+
+        document.getElementById('remediationModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRemediationModal();
+            }
+        });
+
+        // Expose functions globally
+        window.openRemediationModal = openRemediationModal;
+        window.closeRemediationModal = closeRemediationModal;
+        window.renderRemediationContent = renderRemediationContent;
+        window.loadMITREMapping = loadMITREMapping;
+        window.loadMITREMappingForIP = loadMITREMappingForIP;
+        window.copyToClipboard = copyToClipboard;
+        window.copyAllCommands = copyAllCommands;
+    </script>
+</body>
+</html>

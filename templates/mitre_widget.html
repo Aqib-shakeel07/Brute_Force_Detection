@@ -1,0 +1,518 @@
+<!-- ============================================================
+     MITRE ATT&CK WIDGET - Complete Widget
+     ============================================================ -->
+<div class="glass-card mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.45s;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="mb-0">
+                <i class="fas fa-crosshairs" style="color: #8b5cf6;"></i>
+                MITRE ATT&CK Framework
+                <span class="badge" style="background: #8b5cf6; margin-left: 10px; padding: 4px 12px;" id="mitreCount">0 techniques</span>
+            </h5>
+            <p class="text-secondary" style="font-size: 0.8rem; margin-top: 4px;">
+                Mapping detected threats to MITRE ATT&CK techniques
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="nav-btn" onclick="refreshMITRE()" style="padding: 4px 12px; font-size: 0.8rem;">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button class="nav-btn" onclick="toggleMITREView()" style="padding: 4px 12px; font-size: 0.8rem;">
+                <i class="fas fa-expand"></i> Expand
+            </button>
+        </div>
+    </div>
+
+    <!-- MITRE Tabs -->
+    <ul class="nav nav-tabs" style="border-color: var(--glass-border); margin-bottom: 16px;" id="mitreTabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#mitreMatrix" style="color: var(--text-secondary); border-color: transparent; background: transparent;">
+                <i class="fas fa-table"></i> Matrix View
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#mitreSummary" style="color: var(--text-secondary); border-color: transparent; background: transparent;">
+                <i class="fas fa-chart-bar"></i> Summary
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#mitreTimeline" style="color: var(--text-secondary); border-color: transparent; background: transparent;">
+                <i class="fas fa-clock"></i> Timeline
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- Matrix View -->
+        <div class="tab-pane fade show active" id="mitreMatrix">
+            <div id="mitreMatrixContainer">
+                <div class="text-center py-5 text-secondary">
+                    <i class="fas fa-crosshairs fa-3x mb-3" style="opacity: 0.3;"></i>
+                    <p>Upload a CSV file to see MITRE ATT&CK mapping</p>
+                    <p style="font-size: 0.85rem;">Detected threats will be mapped to MITRE techniques</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary View -->
+        <div class="tab-pane fade" id="mitreSummary">
+            <div id="mitreSummaryContainer">
+                <div class="text-center py-5 text-secondary">
+                    <i class="fas fa-chart-bar fa-3x mb-3" style="opacity: 0.3;"></i>
+                    <p>No data available yet</p>
+                    <p style="font-size: 0.85rem;">Upload a CSV to see the threat summary</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline View -->
+        <div class="tab-pane fade" id="mitreTimeline">
+            <div id="mitreTimelineContainer">
+                <div class="text-center py-5 text-secondary">
+                    <i class="fas fa-clock fa-3x mb-3" style="opacity: 0.3;"></i>
+                    <p>No timeline data available</p>
+                    <p style="font-size: 0.85rem;">Attack timeline will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MITRE Details Modal -->
+<div class="modal fade" id="mitreDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: rgba(6,9,22,0.85); backdrop-filter: blur(24px); color: var(--text-primary); border: 1px solid var(--glass-border); box-shadow: 0 0 40px var(--shadow-glow);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
+                <h5 class="modal-title" style="font-family: var(--mono-font);">
+                    <i class="fas fa-crosshairs" style="color: #8b5cf6;"></i>
+                    MITRE ATT&CK Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="mitreDetailBody" style="max-height: 70vh; overflow-y: auto;">
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // MITRE ATT&CK JAVASCRIPT
+    // ============================================================
+
+    let mitreChart = null;
+    let mitreData = null;
+
+    // Load MITRE data
+    async function loadMITREMatrix() {
+        try {
+            const response = await fetch('/api/mitre/matrix');
+            if (!response.ok) throw new Error('Failed to load MITRE matrix');
+            
+            const data = await response.json();
+            if (data.success) {
+                mitreData = data.matrix;
+                renderMITREMatrix(data.matrix);
+                updateMITRECount(data.matrix);
+            }
+        } catch (error) {
+            console.error('MITRE matrix error:', error);
+            document.getElementById('mitreMatrixContainer').innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>Error loading MITRE matrix: ${error.message}</p>
+                    <button class="btn btn-sm" onclick="loadMITREMatrix()" style="background: var(--primary-gradient); border: none; color: white; padding: 6px 20px; border-radius: 50px; margin-top: 10px;">
+                        <i class="fas fa-sync-alt"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    async function loadMITRESummary() {
+        try {
+            const response = await fetch('/api/mitre/summary');
+            if (!response.ok) throw new Error('Failed to load MITRE summary');
+            
+            const data = await response.json();
+            if (data.success) {
+                renderMITRESummary(data.summary, data.total_cves);
+            }
+        } catch (error) {
+            console.error('MITRE summary error:', error);
+            document.getElementById('mitreSummaryContainer').innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>Error loading summary: ${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    async function loadMITRETimeline() {
+        try {
+            const response = await fetch('/api/mitre/timeline');
+            if (!response.ok) throw new Error('Failed to load MITRE timeline');
+            
+            const data = await response.json();
+            if (data.success) {
+                renderMITRETimeline(data.timeline);
+            }
+        } catch (error) {
+            console.error('MITRE timeline error:', error);
+            document.getElementById('mitreTimelineContainer').innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>Error loading timeline: ${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderMITREMatrix(matrix) {
+        const container = document.getElementById('mitreMatrixContainer');
+        
+        if (!matrix || !matrix.tactics) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-inbox fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>No MITRE data available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const tactics = matrix.tactics;
+        const techniques = matrix.techniques || {};
+        
+        let html = `
+            <div class="table-responsive">
+                <table class="table table-sm" style="border-collapse: separate; border-spacing: 0 4px; color: var(--text-primary);">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">Tactic</th>
+                            <th style="font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">Techniques Detected</th>
+                            <th style="width: 100px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">Severity</th>
+                            <th style="width: 80px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Group techniques by tactic
+        const tacticGroups = {};
+        Object.values(techniques).forEach(tech => {
+            const tactic = tech.tactic || 'unknown';
+            if (!tacticGroups[tactic]) tacticGroups[tactic] = [];
+            tacticGroups[tactic].push(tech);
+        });
+        
+        Object.values(tactics).forEach(tactic => {
+            const tacticName = tactic.name || 'Unknown';
+            const color = tactic.color || '#667eea';
+            const techList = tacticGroups[tacticName] || [];
+            
+            // Determine severity based on technique count
+            let severity = 'Low';
+            let severityColor = '#22c55e';
+            if (techList.length > 5) { severity = 'Critical'; severityColor = '#dc2626'; }
+            else if (techList.length > 3) { severity = 'High'; severityColor = '#f59e0b'; }
+            else if (techList.length > 1) { severity = 'Medium'; severityColor = '#3b82f6'; }
+            
+            html += `
+                <tr style="background: rgba(255, 255, 255, 0.02); border-radius: 8px;">
+                    <td>
+                        <span class="badge" style="background: ${color}; color: white; padding: 4px 12px; font-size: 0.75rem; border-radius: 50px;">
+                            ${tacticName}
+                        </span>
+                    </td>
+                    <td>
+                        ${techList.length > 0 ? techList.slice(0, 5).map(t => `
+                            <span class="badge" onclick="showMITREDetail('${t.id}')" style="background: rgba(102, 126, 234, 0.15); color: #a78bfa; margin: 2px; padding: 4px 10px; font-size: 0.7rem; border: 1px solid rgba(102, 126, 234, 0.2); cursor: pointer; transition: all 0.3s;">
+                                ${t.name || t.id}
+                            </span>
+                        `).join('') : '<span class="text-muted" style="font-size: 0.8rem;">No techniques mapped</span>'}
+                        ${techList.length > 5 ? `<span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-secondary); font-size: 0.7rem; padding: 4px 10px;">+${techList.length - 5} more</span>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge" style="background: ${severityColor}; font-size: 0.7rem; padding: 4px 10px; border-radius: 50px;">
+                            ${severity}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: #22c55e; font-size: 0.7rem; padding: 4px 10px; border-radius: 50px;">
+                            <i class="fas fa-shield-alt"></i> Active
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-2 text-secondary" style="font-size: 0.75rem;">
+                <i class="fas fa-info-circle"></i> Click on any technique to view details
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+
+    function renderMITRESummary(summary, totalCVEs) {
+        const container = document.getElementById('mitreSummaryContainer');
+        
+        if (!summary || Object.keys(summary).length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-chart-bar fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>No summary data available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const tactics = Object.keys(summary);
+        const counts = tactics.map(t => summary[t].count);
+        const colors = tactics.map((_, i) => {
+            const colors_list = ['rgba(220,38,38,0.7)', 'rgba(245,158,11,0.7)', 'rgba(59,130,246,0.7)', 'rgba(34,197,94,0.7)', 'rgba(139,92,246,0.7)'];
+            return colors_list[i % colors_list.length];
+        });
+        
+        let html = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                ${tactics.map((tactic, i) => `
+                    <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px 16px; border: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: ${colors[i]};">${counts[i]}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${tactic}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
+                            ${summary[tactic].techniques.map(t => t.name).join(', ')}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Chart
+        html += `
+            <div style="height: 200px; margin-top: 16px;">
+                <canvas id="mitreSummaryChart"></canvas>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Create chart
+        if (window.mitreSummaryChart) {
+            window.mitreSummaryChart.destroy();
+        }
+        
+        const ctx = document.getElementById('mitreSummaryChart');
+        if (ctx) {
+            window.mitreSummaryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: tactics,
+                    datasets: [{
+                        label: 'Techniques by Tactic',
+                        data: counts,
+                        backgroundColor: colors,
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(255,255,255,0.6)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: 'rgba(255,255,255,0.6)',
+                                maxRotation: 30,
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    function renderMITRETimeline(timeline) {
+        const container = document.getElementById('mitreTimelineContainer');
+        
+        if (!timeline || timeline.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-clock fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>No timeline data available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = `
+            <div style="position: relative; padding-left: 30px;">
+                ${timeline.map((item, index) => `
+                    <div style="position: relative; border-left: 2px solid ${item.color || '#667eea'}; padding: 0 0 20px 20px;">
+                        <div style="position: absolute; left: -8px; top: 0; width: 12px; height: 12px; border-radius: 50%; background: ${item.color || '#667eea'}; border: 2px solid var(--gradient-1);"></div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${item.time || 'Just now'}</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">${item.technique || 'Unknown'}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${item.description || ''}</div>
+                        ${item.cve ? `<div style="font-size: 0.7rem; color: var(--accent-1); margin-top: 4px;">CVE: ${item.cve}</div>` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+
+    function updateMITRECount(matrix) {
+        const count = matrix && matrix.techniques ? Object.keys(matrix.techniques).length : 0;
+        document.getElementById('mitreCount').textContent = `${count} techniques`;
+    }
+
+    async function showMITREDetail(techniqueId) {
+        const modal = document.getElementById('mitreDetailModal');
+        const body = document.getElementById('mitreDetailBody');
+        
+        body.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-secondary">Loading technique details...</p>
+            </div>
+        `;
+        
+        try {
+            const response = await fetch(`/api/mitre/technique/${techniqueId}`);
+            if (!response.ok) throw new Error('Failed to load technique details');
+            
+            const data = await response.json();
+            if (data.success) {
+                body.innerHTML = renderTechniqueDetail(data.technique);
+            }
+        } catch (error) {
+            body.innerHTML = `
+                <div class="text-center py-4 text-secondary">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="opacity: 0.3;"></i>
+                    <p>Error loading technique details: ${error.message}</p>
+                </div>
+            `;
+        }
+        
+        // Show modal
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+    }
+
+    function renderTechniqueDetail(technique) {
+        if (!technique) {
+            return `
+                <div class="text-center py-4 text-secondary">
+                    <p>No details available</p>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <span class="badge" style="background: ${technique.tactic_color || '#667eea'}; color: white; padding: 4px 16px; font-size: 0.8rem;">
+                                ${technique.tactic_name || 'Unknown'}
+                            </span>
+                            <span class="badge" style="background: rgba(255,255,255,0.05); color: var(--text-secondary); padding: 4px 12px; font-size: 0.7rem; border: 1px solid var(--glass-border);">
+                                ${technique.id}
+                            </span>
+                        </div>
+                        
+                        <h5 style="color: #c4b5fd; margin-bottom: 8px;">${technique.name}</h5>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">${technique.description || 'No description available'}</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+                            <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Tactic</div>
+                                <div style="font-weight: 600; margin-top: 4px;">${technique.tactic_name || 'Unknown'}</div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Technique ID</div>
+                                <div style="font-weight: 600; margin-top: 4px; font-family: var(--mono-font);">${technique.id}</div>
+                            </div>
+                        </div>
+                        
+                        ${technique.mitigation ? `
+                        <div style="margin-top: 16px; padding: 12px 16px; background: rgba(34, 197, 94, 0.05); border: 1px solid rgba(34, 197, 94, 0.1); border-radius: 8px;">
+                            <div style="font-weight: 600; color: #22c55e; font-size: 0.85rem;">Mitigation</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">${technique.mitigation}</div>
+                        </div>
+                        ` : ''}
+                        
+                        ${technique.detection ? `
+                        <div style="margin-top: 12px; padding: 12px 16px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); border-radius: 8px;">
+                            <div style="font-weight: 600; color: #3b82f6; font-size: 0.85rem;">Detection</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">${technique.detection}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function toggleMITREView() {
+        const container = document.querySelector('.glass-card.mb-4');
+        container.classList.toggle('widget-full');
+        
+        setTimeout(() => {
+            if (window.mitreSummaryChart) {
+                window.mitreSummaryChart.resize();
+            }
+        }, 300);
+    }
+
+    async function refreshMITRE() {
+        showToast('🔄 Refreshing MITRE ATT&CK matrix...', 'info');
+        await Promise.all([
+            loadMITREMatrix(),
+            loadMITRESummary(),
+            loadMITRETimeline()
+        ]);
+        showToast('✅ MITRE data refreshed', 'success');
+    }
+
+    // Auto-load MITRE data
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            loadMITREMatrix();
+            loadMITRESummary();
+            loadMITRETimeline();
+        }, 500);
+    });
+
+    // Also load when results are updated
+    if (typeof window.loadResults === 'function') {
+        const originalLoadResults = window.loadResults;
+        window.loadResults = function() {
+            originalLoadResults();
+            setTimeout(() => {
+                loadMITREMatrix();
+                loadMITRESummary();
+                loadMITRETimeline();
+            }, 500);
+        };
+    }
+</script>
