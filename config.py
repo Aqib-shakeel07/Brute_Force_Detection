@@ -18,9 +18,9 @@ ENABLE_WHOIS = os.getenv('ENABLE_WHOIS', 'False').lower() == 'true'  # Disabled 
 
 
 # ==================== API KEYS ====================
-VIRUSTOTAL_API_KEY = os.getenv('VIRUSTOTAL_API_KEY', '76b2bd59bc4189df1dbc61048e09de59fcbfd3de69b670ee1aa4ba94a39c7dc7')
-ABUSEIPDB_API_KEY = os.getenv('ABUSEIPDB_API_KEY', '4216a37b64cd2d42af75b1b7c177d1cfd979dab0c269c9b5d9cfca9fae4e4516674365703cb310ee')
-SHODAN_API_KEY = os.getenv('SHODAN_API_KEY', 'dev-secret-key-8f7e9a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c')  # NEW
+VIRUSTOTAL_API_KEY = os.getenv('VIRUSTOTAL_API_KEY', 'your virustotal api key')
+ABUSEIPDB_API_KEY = os.getenv('ABUSEIPDB_API_KEY', 'your abuseipDB api key')
+SHODAN_API_KEY = os.getenv('SHODAN_API_KEY', 'your shodan api key')  
 
 # ==================== API SETTINGS ====================
 VT_API_URL = 'https://www.virustotal.com/api/v3'
