@@ -25,82 +25,47 @@
            THEME VARIABLES
            ============================================================ */
         :root {
-            --primary-gradient: linear-gradient(135deg, #00d4ff, #00ff87);
-            --gradient-1: #0a0a0f;
-            --gradient-2: #1a1a2e;
-            --gradient-3: #16213e;
-            --accent-1: #00ff87;
-            --accent-2: #00d4ff;
-            --cyber-cyan: #00ff87;
-            --cyber-green: #00ff87;
-            --cyber-red: #ff2b52;
-            --card-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(0, 255, 135, 0.15);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.65);
-            --shadow-glow: rgba(0, 255, 135, 0.15);
-            --orb-1: rgba(0, 255, 135, 0.25);
-            --orb-2: rgba(0, 212, 255, 0.2);
-            --orb-3: rgba(0, 255, 135, 0.08);
-            --mono-font: 'JetBrains Mono', 'Courier New', monospace;
-            --theme-transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    --primary-gradient: linear-gradient(135deg, #00d4ff, #0088ff);
+    --gradient-1: #08080e;
+    --gradient-2: #0a0a16;
+    --gradient-3: #0c0c1a;
+    --accent-1: #00d4ff;
+    --accent-2: #0088ff;
+    --cyber-cyan: #00d4ff;
+    --cyber-blue: #00d4ff;
+    --cyber-red: #ff2b52;
+    --card-bg: rgba(0, 200, 255, 0.03);
+    --glass-border: rgba(0, 200, 255, 0.12);
+    --text-primary: #e8f0ff;
+    --text-secondary: rgba(180, 220, 255, 0.55);
+    --shadow-glow: rgba(0, 200, 255, 0.12);
+    --orb-1: rgba(0, 200, 255, 0.15);
+    --orb-2: rgba(0, 200, 255, 0.08);
+    --orb-3: rgba(0, 200, 255, 0.04);
+    --mono-font: 'JetBrains Mono', 'Courier New', monospace;
+    --theme-transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-        /* Theme variations */
-        [data-theme="purple"] {
-            --primary-gradient: linear-gradient(135deg, #a855f7, #d946ef);
-            --accent-1: #a855f7;
-            --accent-2: #d946ef;
-            --cyber-cyan: #a855f7;
-            --cyber-green: #a855f7;
-            --glass-border: rgba(168, 85, 247, 0.15);
-            --shadow-glow: rgba(168, 85, 247, 0.1);
-        }
-
-        [data-theme="red"] {
-            --primary-gradient: linear-gradient(135deg, #ff2b52, #ff6b35);
-            --accent-1: #ff2b52;
-            --accent-2: #ff6b35;
-            --cyber-cyan: #ff2b52;
-            --cyber-green: #ff2b52;
-            --glass-border: rgba(255, 43, 82, 0.15);
-            --shadow-glow: rgba(255, 43, 82, 0.1);
-        }
-
-        [data-theme="gold"] {
-            --primary-gradient: linear-gradient(135deg, #f59e0b, #f97316);
-            --accent-1: #f59e0b;
-            --accent-2: #f97316;
-            --cyber-cyan: #f59e0b;
-            --cyber-green: #f59e0b;
-            --glass-border: rgba(245, 158, 11, 0.15);
-            --shadow-glow: rgba(245, 158, 11, 0.1);
-        }
-
-        [data-theme="blue"] {
-            --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
-            --accent-1: #667eea;
-            --accent-2: #764ba2;
-            --cyber-cyan: #00fff2;
-            --cyber-green: #00ff9d;
-            --glass-border: rgba(0, 255, 242, 0.1);
-            --shadow-glow: rgba(0, 255, 242, 0.08);
-        }
-
-        [data-theme="light"] {
-            --gradient-1: #f0f4ff;
-            --gradient-2: #e8edf5;
-            --gradient-3: #dce3ef;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --text-primary: #1a1a2e;
-            --text-secondary: rgba(0, 0, 0, 0.6);
-            --shadow-glow: rgba(0, 0, 0, 0.05);
-            --orb-1: rgba(0, 0, 0, 0.03);
-            --orb-2: rgba(0, 0, 0, 0.02);
-            --orb-3: rgba(0, 0, 0, 0.01);
-        }
-
+/* Force all themes to blue */
+[data-theme="purple"],
+[data-theme="red"],
+[data-theme="gold"],
+[data-theme="green"],
+[data-theme="light"] {
+    --gradient-1: #08080e;
+    --gradient-2: #0a0a16;
+    --gradient-3: #0c0c1a;
+    --accent-1: #00d4ff;
+    --accent-2: #0088ff;
+    --card-bg: rgba(0, 200, 255, 0.03);
+    --glass-border: rgba(0, 200, 255, 0.12);
+    --text-primary: #e8f0ff;
+    --text-secondary: rgba(180, 220, 255, 0.55);
+    --shadow-glow: rgba(0, 200, 255, 0.12);
+    --orb-1: rgba(0, 200, 255, 0.15);
+    --orb-2: rgba(0, 200, 255, 0.08);
+    --orb-3: rgba(0, 200, 255, 0.04);
+}
         /* ============================================================
            BASE STYLES
            ============================================================ */
@@ -630,6 +595,298 @@
             z-index: 1;
             transition: var(--theme-transition);
         }
+        /* ============================================================
+   BIGGER & MORE VISIBLE TEXT
+   ============================================================ */
+
+/* Global text improvements */
+body {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+}
+
+/* Headings - Bigger & Bolder */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.6rem; }
+h5 { font-size: 1.3rem; }
+h6 { font-size: 1.1rem; }
+
+/* Navbar brand - Bigger */
+.navbar-brand {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Navigation links - Bigger */
+.nav-link-custom {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    padding: 8px 20px !important;
+}
+
+/* Stat numbers - Bigger & Glowing */
+.stat-card .stat-number {
+    font-size: 3.2rem !important;
+    font-weight: 900 !important;
+    text-shadow: 0 0 30px var(--shadow-glow), 0 0 60px var(--shadow-glow);
+    letter-spacing: 1px;
+}
+
+.stat-card .stat-label {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* KPI Values - Bigger */
+.kpi-card .kpi-value {
+    font-size: 2.4rem !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 20px var(--shadow-glow);
+}
+
+.kpi-card .kpi-label {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+}
+
+/* Table text - Bigger */
+.table-glass {
+    font-size: 0.95rem !important;
+}
+
+.table-glass thead th {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.2px !important;
+}
+
+.table-glass tbody td {
+    font-size: 0.9rem !important;
+    padding: 14px 18px !important;
+}
+
+/* IP Address in table - Bigger & Glowing */
+.table-glass tbody td strong {
+    font-size: 1rem !important;
+    text-shadow: 0 0 15px var(--shadow-glow);
+}
+
+/* Buttons - Bigger */
+.nav-btn, button.nav-btn {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+}
+
+.btn-analyze {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    padding: 12px 48px !important;
+}
+
+/* Upload zone text */
+.upload-zone h5 {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+}
+
+.upload-zone .upload-sub {
+    font-size: 1.1rem !important;
+}
+
+/* Widget titles */
+.widget-header .title {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+}
+
+/* Card titles */
+.glass-card h5, .glass-card h6 {
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+}
+
+/* Status badge */
+.status-badge {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    padding: 8px 20px !important;
+}
+
+/* Badges - Risk */
+.badge-risk {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    padding: 5px 16px !important;
+}
+
+/* Badge - Type */
+.badge-type {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    padding: 4px 14px !important;
+}
+
+/* Footer terminal */
+.footer-terminal {
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+
+/* Empty state */
+.empty-state h3, .empty-state h5 {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+}
+
+.empty-state p {
+    font-size: 1.1rem !important;
+}
+
+/* Toast notifications */
+.toast-glass {
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+}
+
+/* Encrypted chip */
+.encrypted-chip {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    padding: 6px 16px !important;
+}
+
+/* Text glow for emphasis */
+.text-glow {
+    text-shadow: 0 0 30px var(--shadow-glow), 0 0 60px var(--shadow-glow);
+}
+
+/* Section headers */
+.section-header {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 30px var(--shadow-glow);
+    letter-spacing: 1px;
+}
+
+/* Modal text */
+.modal-title {
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+}
+
+.modal-body {
+    font-size: 1rem !important;
+}
+
+/* MITRE section */
+.mitre-matrix {
+    font-size: 0.95rem !important;
+}
+
+.mitre-matrix th {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+}
+
+.mitre-matrix td {
+    font-size: 0.9rem !important;
+}
+
+/* Timeline entries */
+.timeline-entry {
+    font-size: 0.95rem !important;
+    padding: 10px 16px !important;
+}
+
+.timeline-entry .ip {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+}
+
+/* Cyber cursor */
+.cyber-cursor {
+    width: 10px !important;
+    height: 1.2em !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        font-size: 1rem !important;
+    }
+    
+    .stat-card .stat-number {
+        font-size: 2.4rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.4rem !important;
+    }
+    
+    h1 { font-size: 2.2rem !important; }
+    h2 { font-size: 1.8rem !important; }
+    h3 { font-size: 1.5rem !important; }
+    h4 { font-size: 1.3rem !important; }
+    h5 { font-size: 1.1rem !important; }
+    
+    .kpi-card .kpi-value {
+        font-size: 1.8rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card .stat-number {
+        font-size: 1.8rem !important;
+    }
+    
+    .kpi-card .kpi-value {
+        font-size: 1.4rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem !important;
+    }
+}
+/* Glowing text effects */
+.glow-blue {
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.3),
+                 0 0 40px rgba(0, 212, 255, 0.15),
+                 0 0 80px rgba(0, 212, 255, 0.08);
+}
+
+.glow-strong {
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.4),
+                 0 0 60px rgba(0, 212, 255, 0.2),
+                 0 0 100px rgba(0, 212, 255, 0.1);
+}
+
+.text-gradient {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-uppercase-strong {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
 
         /* ============================================================
            BUTTON FIX
@@ -1755,7 +2012,19 @@
                 font-size: 1.4rem;
             }
         }
+        /* Cyber Canvas Background */
+#cyberCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+}
     </style>
+    
 </head>
 
 <body>
@@ -1769,6 +2038,7 @@
     <div class="circuit-grid"></div>
     <div class="scan-sweep"></div>
     <div class="particles" id="particles"></div>
+    <canvas id="cyberCanvas"></canvas>
 
     <!-- ============================================================
          NAVBAR
@@ -1776,7 +2046,7 @@
     <nav class="navbar-glass">
         <div class="main-container">
             <div class="d-flex justify-content-between align-items-center">
-                <div class="navbar-brand">
+                <div class="navbar-brand glow-strong">
                     <span class="shield-wrap"><i class="fas fa-shield-alt"></i></span>
                     Threat Intelligence Dashboard<span class="cyber-cursor"></span>
                 </div>
@@ -1806,18 +2076,18 @@
                         <i class="fas fa-moon theme-icon" id="themeIcon"></i>
                         <span id="themeLabel">Dark</span>
                         <div class="color-picker" id="colorPicker">
-                            <span class="color-dot green active" data-theme="green"
-                                onclick="event.stopPropagation(); setTheme('green')" title="Cyber Green"></span>
-                            <span class="color-dot purple" data-theme="purple"
-                                onclick="event.stopPropagation(); setTheme('purple')" title="Cyber Purple"></span>
-                            <span class="color-dot red" data-theme="red"
-                                onclick="event.stopPropagation(); setTheme('red')" title="Cyber Red"></span>
-                            <span class="color-dot gold" data-theme="gold"
-                                onclick="event.stopPropagation(); setTheme('gold')" title="Cyber Gold"></span>
-                            <span class="color-dot blue" data-theme="blue"
-                                onclick="event.stopPropagation(); setTheme('blue')" title="Cyber Blue"></span>
-                            <span class="color-dot light" data-theme="light"
-                                onclick="event.stopPropagation(); setTheme('light')" title="Light Mode"></span>
+                            <span class="color-dot blue active" data-theme="blue"
+    onclick="event.stopPropagation(); setTheme('blue')" title="Cyber Blue"></span>
+<span class="color-dot purple" data-theme="purple"
+    onclick="event.stopPropagation(); setTheme('purple')" title="Cyber Purple"></span>
+<span class="color-dot red" data-theme="red"
+    onclick="event.stopPropagation(); setTheme('red')" title="Cyber Red"></span>
+<span class="color-dot gold" data-theme="gold"
+    onclick="event.stopPropagation(); setTheme('gold')" title="Cyber Gold"></span>
+<span class="color-dot green" data-theme="green"
+    onclick="event.stopPropagation(); setTheme('green')" title="Cyber Green"></span>
+<span class="color-dot light" data-theme="light"
+    onclick="event.stopPropagation(); setTheme('light')" title="Light Mode"></span>
                         </div>
                     </div>
 
@@ -2288,7 +2558,7 @@
         // ============================================================
         // GLOBALS
         // ============================================================
-        let currentTheme = localStorage.getItem('dashboard-theme') || 'green';
+        let currentTheme = localStorage.getItem('dashboard-theme') || 'blue';
         let isDark = true;
         let statusInterval = null;
         let analysisComplete = false;
@@ -3910,7 +4180,173 @@
 
         console.log('✅ All functions are now globally accessible!');
         console.log('✅ Dashboard JavaScript loaded successfully!');
+        // ============================================================
+// CYBER PARTICLE NETWORK - CONNECTING DOTS
+// ============================================================
+(function initCyberNetwork() {
+    const canvas = document.getElementById('cyberCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    let mouse = { x: null, y: null };
+    
+    // Configuration
+    const CONFIG = {
+        particleCount: 120,
+        maxDistance: 120,
+        particleSize: 2.5,
+        lineOpacity: 0.15,
+        color: '#00d4ff',  // Blue theme
+        speed: 0.3,
+        connectMouse: true
+    };
+    
+    // Resize handler
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    
+    // Mouse tracking
+    if (CONFIG.connectMouse) {
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+    }
+    
+    // Particle class
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * CONFIG.speed;
+            this.vy = (Math.random() - 0.5) * CONFIG.speed;
+            this.radius = CONFIG.particleSize + Math.random() * 1.5;
+        }
+        
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            // Bounce off edges
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+            
+            // Clamp
+            this.x = Math.max(0, Math.min(width, this.x));
+            this.y = Math.max(0, Math.min(height, this.y));
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = CONFIG.color;
+            ctx.fill();
+            
+            // Glow effect
+            ctx.shadowColor = CONFIG.color;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+    
+    // Create particles
+    for (let i = 0; i < CONFIG.particleCount; i++) {
+        particles.push(new Particle());
+    }
+    
+    // Draw connecting lines
+    function drawLines() {
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < CONFIG.maxDistance) {
+                    const opacity = CONFIG.lineOpacity * (1 - distance / CONFIG.maxDistance);
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = CONFIG.color;
+                    ctx.globalAlpha = opacity;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+            }
+        }
+    }
+    
+    // Draw mouse connections
+    function drawMouseConnections() {
+        if (!CONFIG.connectMouse || mouse.x === null) return;
+        
+        for (const particle of particles) {
+            const dx = particle.x - mouse.x;
+            const dy = particle.y - mouse.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < CONFIG.maxDistance * 1.2) {
+                const opacity = CONFIG.lineOpacity * 1.5 * (1 - distance / (CONFIG.maxDistance * 1.2));
+                ctx.beginPath();
+                ctx.moveTo(particle.x, particle.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.strokeStyle = CONFIG.color;
+                ctx.globalAlpha = opacity;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                
+                // Glow circle at mouse
+                ctx.beginPath();
+                ctx.arc(mouse.x, mouse.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = CONFIG.color;
+                ctx.shadowColor = CONFIG.color;
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+    }
+    
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Update and draw particles
+        for (const particle of particles) {
+            particle.update();
+            particle.draw();
+        }
+        
+        // Draw connections
+        drawLines();
+        drawMouseConnections();
+        
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    // Handle resize
+    window.addEventListener('resize', () => {
+        resize();
+    });
+    
+})();
     </script>
+    
 </body>
 
 </html>
